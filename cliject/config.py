@@ -17,3 +17,8 @@ def get_default_board(org: Optional[str] = None) -> Optional[int]:
     if org:
         return config.get("orgs", {}).get(org, {}).get("default_board")
     return config.get("default_board")
+
+
+def get_default_view() -> str:
+    config = load_config()
+    return config.get("default_view", "kanban")
