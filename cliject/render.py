@@ -118,7 +118,43 @@ def render_project_list(projects: list[Project], show_closed: bool = False) -> N
     console.print(table)
 
 
-def render_board(board: Board, show_empty: bool = False) -> None:
+def _render_item_list(item: BoardItem) -> Text:
+    """Compact single-line rendering for list view."""
+    is_closed = item.state in ("CLOSED", "MERGED")
+
+    t = Text()
+    t.append("• ", style="dim")
+
+    badge = ITEM_TYPE_BADGE.get(item.item_type, "[?]")
+    t.append(badge, style="dim" if is_closed else "bold")
+    t.append(" ")
+
+    title_style = "dim strike" if is_closed else ""
+    if item.url:
+        title_style = f"{title_style} link {item.url}".strip()
+    t.append(item.title, style=title_style)
+
+    if item.repo and item.number is not None:
+        short_repo = item.repo.split("/")[-1] if "/" in item.repo else item.repo
+        t.append(f"  {short_repo}#{item.number}", style="dim cyan")
+
+    if item.assignees:
+        logins = " ".join(f"@{a.login}" for a in item.assignees)
+        t.append(f"  {logins}", style="dim green")
+
+    if item.labels:
+        for label in item.labels:
+            hex_color = label.color if label.color else "ffffff"
+            t.append(f" {label.name} ", style=f"bold on #{hex_color}")
+            t.append(" ")
+
+    if item.due_date:
+        t.append(f"  due: {item.due_date}", style="dim yellow")
+
+    return t
+
+
+def _print_board_header(board: Board) -> None:
     project = board.project
     console.print(
         f"\n[bold]{project.title}[/bold]  "
@@ -128,6 +164,37 @@ def render_board(board: Board, show_empty: bool = False) -> None:
     if project.short_description:
         console.print(f"[dim]{project.short_description}[/dim]")
     console.print()
+
+
+def render_board_list(board: Board, show_empty: bool = False) -> None:
+    _print_board_header(board)
+
+    all_columns = list(board.columns)
+    if board.no_status_items:
+        from .models import BoardColumn
+        all_columns.append(BoardColumn(
+            name=f"No {board.status_field_name}",
+            color="GRAY",
+            items=board.no_status_items,
+        ))
+
+    any_printed = False
+    for col in all_columns:
+        if not show_empty and not col.items:
+            continue
+        rich_color = _rich_color(col.color)
+        console.print(f"[bold {rich_color}]{col.name}[/]  [dim]({len(col.items)})[/]")
+        for item in col.items:
+            console.print(_render_item_list(item))
+        console.print()
+        any_printed = True
+
+    if not any_printed:
+        console.print("[dim]No items to display.[/dim]")
+
+
+def render_board(board: Board, show_empty: bool = False) -> None:
+    _print_board_header(board)
 
     panels = []
     for col in board.columns:

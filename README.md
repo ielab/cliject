@@ -51,6 +51,12 @@ cliject board 4 --me
 
 # Show empty columns
 cliject board 4 --show-empty
+
+# List view (items as bullet list under status headings)
+cliject board 4 --view list
+
+# Kanban view (default)
+cliject board 4 --view kanban
 ```
 
 ### All flags
@@ -64,6 +70,7 @@ cliject board 4 --show-empty
 | `board` | `--group-by, -g` | Field name to group columns by (default: `Status`) |
 | `board` | `--me` | Only show items assigned to you |
 | `board` | `--show-empty` | Show columns that have no items |
+| `board` | `--view, -v` | Display style: `kanban` (default) or `list` |
 
 ## Configuration
 
@@ -72,6 +79,7 @@ Create `~/.config/cliject/config.json` to set default board numbers:
 ```json
 {
   "default_board": 4,
+  "default_view": "list",
   "orgs": {
     "my-org": {
       "default_board": 7
@@ -84,6 +92,7 @@ Create `~/.config/cliject/config.json` to set default board numbers:
 ```
 
 - `default_board` — used by `cliject board` with no number and no `--org`
+- `default_view` — preferred display style: `"kanban"` (default) or `"list"`; overridden by `--view`
 - `orgs.<name>.default_board` — used by `cliject board --org <name>` with no number
 
 ## Project structure

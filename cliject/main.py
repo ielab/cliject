@@ -5,8 +5,8 @@ from typing import Optional
 import typer
 
 from .board import fetch_board, fetch_projects
-from .config import get_default_board
-from .render import render_board, render_project_list
+from .config import get_default_board, get_default_view
+from .render import render_board, render_board_list, render_project_list
 
 app = typer.Typer(
     name="cliject",
@@ -43,6 +43,7 @@ def board(
     group_by: str = typer.Option("Status", "--group-by", "-g", help="Field name to group by"),
     show_empty: bool = typer.Option(False, "--show-empty", help="Show columns with no items"),
     me: bool = typer.Option(False, "--me", help="Only show items assigned to me"),
+    view: Optional[str] = typer.Option(None, "--view", "-v", help="Display style: kanban or list (overrides config)"),
 ) -> None:
     """Render a project as a Kanban board."""
     if number is None:
@@ -64,4 +65,12 @@ def board(
         typer.echo(f"Error: {e}", err=True)
         raise typer.Exit(1)
 
-    render_board(b, show_empty=show_empty)
+    resolved_view = view or get_default_view()
+    if resolved_view not in ("kanban", "list"):
+        typer.echo(f"Error: --view must be 'kanban' or 'list', got '{resolved_view}'", err=True)
+        raise typer.Exit(1)
+
+    if resolved_view == "list":
+        render_board_list(b, show_empty=show_empty)
+    else:
+        render_board(b, show_empty=show_empty)
