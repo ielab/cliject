@@ -30,8 +30,24 @@ platforms = ["linux-64", "osx-arm64", "osx-64"]
 [tool.pixi.pypi-dependencies]
 cliject = { path = ".", editable = true }
 
+[tool.pixi.feature.py310.dependencies]
+python = "3.10.*"
+
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+
+[tool.pixi.feature.py313.dependencies]
+python = "3.13.*"
+
 [tool.pixi.environments]
 dev = { features = ["dev"], solve-group = "default" }
+py310 = { features = ["dev", "py310"], solve-group = "default" }
+py311 = { features = ["dev", "py311"], solve-group = "default" }
+py312 = { features = ["dev", "py312"], solve-group = "default" }
+py313 = { features = ["dev", "py313"], solve-group = "default" }
 
 [tool.pixi.tasks]
 test = { cmd = "pytest", description = "Run test suite" }
