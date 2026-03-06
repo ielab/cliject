@@ -78,7 +78,7 @@ def board(
 
 @app.command()
 def column(
-    column_name: Optional[str] = typer.Argument(None, help="Column name to display (uses config default_column if omitted)"),
+    column_name: Optional[str] = typer.Argument(None, help="Column name to display (default: config default_column)"),
     number: Optional[int] = typer.Option(None, "--board", "-b", help="Project number (uses config default if omitted)"),
     org: Optional[str] = typer.Option(None, "--org", "-o", help="GitHub organization login"),
     group_by: str = typer.Option("Status", "--group-by", "-g", help="Field name to group by"),
