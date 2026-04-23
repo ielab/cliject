@@ -122,7 +122,14 @@ def column(
         raise typer.Exit(1)
 
     if xbar:
-        typer.echo(f"{matched.name} ({len(matched.items)})")
+        if matched.items:
+            first = matched.items[0]
+            header = first.title
+            if first.url:
+                header += f" | href={first.url}"
+        else:
+            header = f"{matched.name} (empty)"
+        typer.echo(header)
         typer.echo("---")
         for item in matched.items:
             line = item.title
